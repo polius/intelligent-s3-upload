@@ -73,7 +73,7 @@ class S3MultipartUpload:
     def __upload(self, mpu_id):
         exception = None
         part_size = int(self._key['size'] / (10000 * 1024**2)) + (self._key['size'] % (10000 * 1024**2) > 0)
-        part_size = 5 * 1024**2 if part_size < 5 else part_size
+        part_size = 5 * 1024**2 if part_size < 5 else part_size * 1024**2
         total_parts = int(self._key['size'] / part_size) + (self._key['size'] % part_size > 0)
         parts = []
         part_number = 1
