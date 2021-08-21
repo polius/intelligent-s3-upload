@@ -24,7 +24,7 @@ $ git clone https://github.com/polius/intelligent-s3-upload.git
 #### Install the dependencies
 
 ```
-$ pip3 install boto3 --user
+$ python3 -m pip install boto3 --user
 ```
 
 ## Setup
