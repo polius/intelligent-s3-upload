@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+import os
 import sys
 import threading
 from time import sleep
@@ -17,7 +16,7 @@ class S3Upload:
         # Init Variables
         self._file_path = item['file_path']
         self._key = {
-            'name': self._s3.bucket_prefix + item['file_path'][len(self._path):], 
+            'name': self._s3.bucket_prefix + os.path.basename(self._file_path), 
             'size': item['file_size'], 
             'size_parsed': item['file_size_parsed']
         }
@@ -39,7 +38,10 @@ class S3Upload:
         exception = None
         for i in range(self._s3.retry_attempts):
             try:
-                self._s3.connection().upload_file(Filename=self._file_path, Bucket=self._s3.bucket_name, Key=(self._key['name']), Callback=ProgressBar(self._key, self._progress), ExtraArgs={'StorageClass': self._s3.storage_class})
+                extra_args = {'StorageClass': self._s3.storage_class}
+                if self._s3.server_side_encryption:
+                    extra_args['ServerSideEncryption'] = 'AES256'
+                self._s3.connection().upload_file(Filename=self._file_path, Bucket=self._s3.bucket_name, Key=(self._key['name']), Callback=ProgressBar(self._key, self._progress), ExtraArgs=extra_args)
                 return
             except Exception as e:
                 exception = str(e)

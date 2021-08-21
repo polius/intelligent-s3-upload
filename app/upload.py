@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import os
 import sys
 import json
@@ -15,7 +13,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Intelligent S3 Upload')
     parser.add_argument('--path', required=True, help="The absolute file path (can be either a folder or a file) to upload to Amazon S3")
     args = parser.parse_args()
-    args.path = args.path + '/' if not args.path.endswith('/') else args.path
+    args.path = os.path.normpath(args.path)
     return args
 
 def load_credentials():

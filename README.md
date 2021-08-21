@@ -39,7 +39,8 @@ Before executing the **Intelligent S3 Upload**, modify the [credentials.json](ht
     "bucket_name": "",
     "bucket_prefix": "",
     "storage_class": "",
-    "skip_s3_existing_files": true
+    "skip_s3_existing_files": true,
+    "server_side_encryption": true,
 }
 ```
 
@@ -60,6 +61,33 @@ Before executing the **Intelligent S3 Upload**, modify the [credentials.json](ht
 | DEEP_ARCHIVE |
 
 - **skip_s3_existing_files**: Skip uploading objects if these already exists in S3. Possible values: [ true | false ]
+
+## AWS Policy
+
+To be able to run the script check that your policy meet the following requirements:
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:ListBucketMultipartUploads",
+                "s3:AbortMultipartUpload",
+                "s3:ListBucket",
+                "s3:ListMultipartUploadParts"
+            ],
+            "Resource": [
+                "arn:aws:s3:::yourbucket/*",
+                "arn:aws:s3:::yourbucket"
+            ]
+        }
+    ]
+}
+```
 
 ## Execution
 

@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+import os
 import sys
 from time import sleep
 from S3 import S3
@@ -16,7 +15,7 @@ class S3MultipartUpload:
         # Init Variables
         self._file_path = item['file_path']
         self._key = {
-            'name': self._s3.bucket_prefix + item['file_path'][len(self._path):], 
+            'name': self._s3.bucket_prefix + os.path.basename(self._file_path),
             'size': item['file_size'], 
             'size_parsed': item['file_size_parsed']
         }
@@ -61,7 +60,10 @@ class S3MultipartUpload:
         exception = None
         for i in range(self._s3.retry_attempts):
             try:
-                mpu = self._s3.connection().create_multipart_upload(Bucket=self._s3.bucket_name, Key=self._key['name'], StorageClass=self._s3.storage_class)
+                if self._s3.server_side_encryption:
+                    mpu = self._s3.connection().create_multipart_upload(Bucket=self._s3.bucket_name, Key=self._key['name'], StorageClass=self._s3.storage_class, ServerSideEncryption='AES256')
+                else:
+                    mpu = self._s3.connection().create_multipart_upload(Bucket=self._s3.bucket_name, Key=self._key['name'], StorageClass=self._s3.storage_class)
                 mpu_id = mpu["UploadId"]
                 return mpu_id
             except Exception as e:

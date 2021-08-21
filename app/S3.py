@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import boto3
 from botocore.client import ClientError
 
@@ -13,6 +11,7 @@ class S3:
             self.bucket_prefix = credentials['bucket_path'] if credentials['bucket_path'].endswith('/') else credentials['bucket_path'] + '/'
         self.bucket_prefix = self.bucket_prefix if not self.bucket_prefix.startswith('/') else self.bucket_prefix[1:]
         self.skip_existing_files = credentials['skip_s3_existing_files']
+        self.server_side_encryption = credentials['server_side_encryption']
         self.retry_attempts = 3
 
         # Init S3 Connection
@@ -44,5 +43,5 @@ class S3:
     def __check_s3_connection(self):
         try:
             self._s3.head_bucket(Bucket=self.bucket_name)
-        except ClientError:
+        except ClientError as e:
             raise Exception("- The bucket '{}' does not exist or you have no access.".format(self.bucket_name))

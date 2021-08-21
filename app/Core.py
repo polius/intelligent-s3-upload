@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import os
 from S3Upload import S3Upload
 from S3MultipartUpload import S3MultipartUpload
@@ -14,10 +12,9 @@ class Core:
 
     def upload(self):
         print("- Scanning files...")
-
         # Check if the resource exists
-        if not (os.path.exists(self._path)):
-            raise Exception("- The provided path '{}' does not exist".format(self._path))
+        if not os.path.exists(self._path):
+           raise Exception("- The provided path '{}' does not exist".format(self._path))
 
         # Get all resources
         if os.path.isfile(self._path):
