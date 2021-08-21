@@ -61,6 +61,7 @@ Before executing the **Intelligent S3 Upload**, modify the [credentials.json](ht
 | DEEP_ARCHIVE |
 
 - **skip_s3_existing_files**: Skip uploading objects if these already exists in S3. Possible values: [ true | false ]
+- **server_side_encryption**: Enable Server-side encryption using the Amazon S3 key (SSE-S3). Possible values: [ true | false ]
 
 ## AWS Policy
 
