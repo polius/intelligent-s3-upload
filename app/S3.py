@@ -6,13 +6,12 @@ class S3:
         # Init Variables
         self.storage_class = credentials['storage_class']
         self.bucket_name = credentials['bucket_name']
-        self.bucket_prefix = ''
         if credentials['bucket_path'] not in ['', '/']: 
             self.bucket_prefix = credentials['bucket_path'] if credentials['bucket_path'].endswith('/') else credentials['bucket_path'] + '/'
         self.bucket_prefix = self.bucket_prefix if not self.bucket_prefix.startswith('/') else self.bucket_prefix[1:]
         self.skip_existing_files = credentials['skip_s3_existing_files']
         self.server_side_encryption = credentials['server_side_encryption']
-        self.retry_attempts = 3
+        self.retry_attempts = 5
 
         # Init S3 Connection
         session = boto3.Session(
@@ -29,11 +28,11 @@ class S3:
         # Return S3 Connection
         return self._s3
 
-    def check_s3_key_exists(self, key):
-        response = self._s3.list_objects_v2(Bucket=self.bucket_name, Prefix=key['name'])
+    def check_s3_key_exists(self, item):
+        response = self._s3.list_objects_v2(Bucket=self.bucket_name, Prefix=item['key'])
 
         for obj in response.get('Contents', []):
-            if obj['Key'] == key['name'] and obj['Size'] == key['size']:
+            if obj['Key'] == item['key'] and obj['Size'] == item['size']:
                 return True
         return False
 
