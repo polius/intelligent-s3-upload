@@ -31,16 +31,17 @@ class S3MultipartUpload:
         for i in range(self._s3.retry_attempts):
             try:
                 mpus = self._s3.connection().list_multipart_uploads(Bucket=self._s3.bucket_name)
-                aborted = []
                 if "Uploads" in mpus:
                     for u in mpus["Uploads"]:
-                        aborted.append(self._s3.connection().abort_multipart_upload(Bucket=self._s3.bucket_name, Key=u["Key"], UploadId=u["UploadId"]))
-                return aborted
+                        self._s3.connection().abort_multipart_upload(Bucket=self._s3.bucket_name, Key=u["Key"], UploadId=u["UploadId"])
+                    if len(mpus["Uploads"]) == 1000:
+                        self.__abort(item)
             except Exception as e:
                 exception = str(e)
                 print("[Attempt {}/{}] Multipart abort process failed. Retrying in 3 seconds...".format(i+1, self._s3.retry_attempts))
                 sleep(3)
-        raise Exception("- Multipart abort process failed with key '{}' after {} attempts.\nError: {}".format(item['key'], self._s3.retry_attempts, exception))
+        if exception:
+            raise Exception("- Multipart abort process failed with key '{}' after {} attempts.\nError: {}".format(item['key'], self._s3.retry_attempts, exception))
 
     def __create(self, item):
         exception = None

@@ -18,13 +18,14 @@ Upload files or folders (even with subfolders) to Amazon S3 in a totally automat
 #### Clone the repository
 
 ```
-$ git clone https://github.com/polius/intelligent-s3-upload.git
+git clone https://github.com/polius/intelligent-s3-upload.git
 ```
 
 #### Install the dependencies
 
 ```
-$ python3 -m pip install boto3 --user
+python3 -m pip install boto3 --user
+python3 -m pip install requests --user
 ```
 
 ## Setup
@@ -41,6 +42,7 @@ Before executing the **Intelligent S3 Upload**, modify the [credentials.json](ht
     "storage_class": "",
     "skip_s3_existing_files": true,
     "server_side_encryption": true,
+    "slack_url": ""
 }
 ```
 
@@ -59,13 +61,15 @@ Before executing the **Intelligent S3 Upload**, modify the [credentials.json](ht
 | INTELLIGENT_TIERING |
 | GLACIER |
 | DEEP_ARCHIVE |
+| OUTPOSTS |
 
 - **skip_s3_existing_files**: Skip uploading objects if these already exists in S3. Possible values: [ true | false ]
 - **server_side_encryption**: Enable Server-side encryption using the Amazon S3 key (SSE-S3). Possible values: [ true | false ]
+- **slack_url**: (Optional) Enter a Webhook URL to send a message to Slack when a upload finishes.
 
 ## AWS Policy
 
-To be able to run the script check that your policy meet the following requirements:
+To be able to run the script check that your policy meets the following requirements:
 
 ```
 {
@@ -93,10 +97,10 @@ To be able to run the script check that your policy meet the following requireme
 ## Execution
 
 ```
-$ python3 upload.py --path "{PATH}"
+python3 upload.py --path "{PATH}"
 ```
 
-Replace the string **{PATH}** with the absolute file/folder path to upload to Amazon S3.
+Replace the **{PATH}** string with the absolute file/folder path.
 
 ## License
 

@@ -1,8 +1,9 @@
 import os
-import sys
 import json
+import time
 import argparse
-from time import time
+import calendar
+import requests
 from datetime import timedelta
 from Core import Core
 
@@ -33,6 +34,36 @@ def validate_credentials(credentials):
         raise Exception("The 'storage_class' cannot be empty.\nAllowed values: 'STANDARD'|'REDUCED_REDUNDANCY'|'STANDARD_IA'|'ONEZONE_IA'|'INTELLIGENT_TIERING'|'GLACIER'|'DEEP_ARCHIVE'")
     if credentials['skip_s3_existing_files'] not in [True, False]:
         raise Exception("The 'skip_existing_files' should be 'true' or 'false'")
+    if credentials['server_side_encryption'] not in [True, False]:
+        raise Exception("The 'server_side_encryption' should be 'true' or 'false'")
+
+def slack(url, overall, status, error=None):
+    webhook_data = {
+        "attachments": [
+            {
+                "text": "Upload process finished",
+                "fields": [
+                    {
+                        "title": "Execution Time",
+                        "value": overall,
+                        "short": False
+                    }
+                ],
+                "color": 'good' if status == 0 else 'warning' if status == 1 else 'danger',
+                "ts": calendar.timegm(time.gmtime())
+            }
+        ]
+    }
+    if error:
+        error_data = {
+            "title": "Error",
+            "value": f"```{error}```",
+            "short": False
+        }
+        webhook_data["attachments"][0]["fields"].insert(0, error_data)
+
+    # Send the Slack message
+    requests.post(url, data=json.dumps(webhook_data), headers={'Content-Type': 'application/json'})
 
 def main():
     # Clear Screen
@@ -41,17 +72,16 @@ def main():
     print("‖  Intelligent S3 Upload                                           ‖")
     print("+==================================================================+")
 
-    # Check Python Version
-    if sys.version_info[0] < 3:
-        print("Python 3 required to run this application")
-        sys.exit()
-
     # Parse Arguments
     args = parse_args()
 
+    # Execution Status & Error
+    status = 0  # 0: SUCCESS | 1: INTERRUPTED | 2: ERROR
+    error = None
+
     try:
         # Store the Start Time
-        start_time = time()
+        start_time = time.time()
 
         # Load & Validate Credentials
         credentials = load_credentials()
@@ -64,15 +94,18 @@ def main():
         core.upload()
 
     except Exception as e:
-        print(e)
+        status = 2
+        error = str(e)
     except KeyboardInterrupt as e:
+        status = 1
         print("\n- Upload process interrupted.")
         if len(str(e)) != 0:
             print("- Total bytes uploaded: {}".format(e))
     finally:
-        overall_time = str(timedelta(seconds=time() - start_time))
+        overall_time = str(timedelta(seconds=time.time() - start_time))
         print("- Overall Time: {}".format(overall_time))
-
+        if credentials['slack_url']:
+            slack(credentials['slack_url'], overall_time, status, error)
 
 if __name__ == "__main__":
     main()
