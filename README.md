@@ -11,7 +11,7 @@ Upload files or folders (even with subfolders) to Amazon S3 in a totally automat
 
 - **User Friendly Interface**: Just check the demo to see with your own eyes how the upload process is performed.    
 
-[**Checkout the demo**](https://is3u.alzina.io)
+[**Checkout the demo**](https://is3u.alzina.dev)
 
 ## Installation
 
